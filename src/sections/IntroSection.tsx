@@ -110,20 +110,20 @@ export const IntroSection: FC = () => (
       <Counter
         end={98}
         suffix="%"
-        label="precisión · con tools"
+        label="precisión · con WebMCP tools"
         color="var(--accent-electric)"
       />
       <Counter
-        end={45}
+        end={89}
         suffix="%"
-        label="precisión · sin tools"
-        color="var(--accent-hot)"
+        label="mejor caso · agentes híbridos hoy"
+        color="var(--accent-gold)"
       />
       <Counter
         end={30}
-        suffix="x"
-        label="menos coste en tokens"
-        color="var(--accent-signal)"
+        suffix="%"
+        label="peor caso · agentes en producción"
+        color="var(--accent-hot)"
       />
     </div>
 

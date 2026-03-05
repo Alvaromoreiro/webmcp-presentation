@@ -1,52 +1,77 @@
 import { useState, type FC } from "react";
 import { Slide } from "../components/Slide";
 
-interface ComparisonItem {
+interface ApproachItem {
   id: string;
   title: string;
   emoji: string;
   color: string;
+  who: string;
   steps: string[];
-  stats: { label: string; value: string }[];
+  pros: string[];
+  cons: string[];
 }
 
-const comparisons: ComparisonItem[] = [
+const approaches: ApproachItem[] = [
   {
-    id: "before",
-    title: "Hoy — Browser Use / CUA",
+    id: "vision",
+    title: "Visión pura",
     emoji: "📸",
     color: "var(--accent-hot)",
+    who: "Skyvern v1, WebVoyager, VimGPT",
     steps: [
-      "Agente toma screenshot de la página",
-      "Envía imagen a un modelo de visión (GPT-4o, etc.)",
-      "El modelo interpreta píxeles y adivina botones",
+      "Captura screenshot de la página",
+      "Envía imagen a modelo multimodal (GPT-4o...)",
+      "Interpreta píxeles para localizar elementos",
       "Genera coordenadas de click estimadas",
-      "Sintetiza eventos del DOM",
-      "Si el UI cambia 5px... falla. Repite todo.",
     ],
-    stats: [
-      { label: "latencia", value: "~3-8s/acción" },
-      { label: "precisión", value: "~45%" },
-      { label: "coste", value: "$$$" },
+    pros: ["Funciona en cualquier web, incluso canvas/Figma"],
+    cons: [
+      "+0.8s latencia por cada screenshot (image encoder)",
+      "10-20x más caro en tokens que leer HTML",
+      "Falla con cambios sutiles de estado entre capturas",
     ],
   },
   {
-    id: "after",
-    title: "WebMCP — Tool Contract",
-    emoji: "⚡",
-    color: "var(--accent-electric)",
+    id: "dom",
+    title: "DOM / Accessibility Tree",
+    emoji: "🌳",
+    color: "var(--accent-gold)",
+    who: "Browser-Use 1.0, Agent-E, Playwright MCP",
     steps: [
-      "La web registra tools con schemas estructurados",
-      "El agente descubre tools via navigator.modelContext",
-      "Invoca la función directamente con JSON",
-      "Recibe respuesta estructurada al instante",
-      "Una sola llamada = una acción completa",
-      "Inmune a cambios de UI. Resultado predecible.",
+      "Parsea el DOM o extrae el accessibility tree",
+      "Crea representación textual con refs (@e1, @e2...)",
+      "El LLM razona sobre la estructura de la página",
+      "Ejecuta acciones sobre elementos referenciados",
     ],
-    stats: [
-      { label: "latencia", value: "~100ms" },
-      { label: "precisión", value: "~98%" },
-      { label: "coste", value: "$" },
+    pros: [
+      "Mucho más rápido (~3s/paso vs ~5-8s con visión)",
+      "~200-400 tokens vs ~3000-5000 de un DOM completo",
+    ],
+    cons: [
+      "Falla en formularios dinámicos que cambian tras input",
+      "No ve contenido en canvas, imágenes o layouts complejos",
+    ],
+  },
+  {
+    id: "hybrid",
+    title: "Híbrido (la norma hoy)",
+    emoji: "🔀",
+    color: "var(--accent-signal)",
+    who: "OpenAI Atlas/CUA, Perplexity Comet, ChatGPT Agent",
+    steps: [
+      "Usa accessibility tree como base principal",
+      "Cae a visión solo cuando es necesario (canvas, CAPTCHA)",
+      "Combina ambas señales para decidir acciones",
+      "Múltiples round-trips por cada tarea completa",
+    ],
+    pros: [
+      "Lo más fiable hoy en producción",
+      "Adapta el enfoque según la complejidad de la página",
+    ],
+    cons: [
+      "Sigue infiriendo estructura desde fuera",
+      "Éxito en producción: 30%-89% según herramienta y tarea",
     ],
   },
 ];
@@ -67,36 +92,40 @@ export const ProblemSection: FC = () => {
           marginBottom: 14,
         }}
       >
-        El problema de los agentes{" "}
+        Cómo interactúan los agentes con la web{" "}
         <span style={{ color: "var(--accent-hot)" }}>hoy</span>
       </h2>
       <p
         style={{
           color: "var(--ink-secondary)",
           textAlign: "center",
-          maxWidth: 540,
+          maxWidth: 600,
           marginBottom: 50,
           fontSize: 16,
           fontWeight: 300,
           lineHeight: 1.7,
         }}
       >
-        Los agentes IA tratan la web como una imagen. Hacen screenshots,
-        adivinan dónde clickar, y si el botón se mueve unos píxeles... todo
-        falla.
+        Existen tres enfoques principales. Los agentes de producción usan
+        híbridos, pero todos comparten el mismo problema de fondo:{" "}
+        <strong style={{ color: "var(--ink-primary)" }}>
+          el agente tiene que inferir la estructura de la página desde fuera.
+        </strong>
       </p>
 
+      {/* Three approach cards */}
       <div
         style={{
           display: "flex",
-          gap: 24,
+          gap: 18,
           flexWrap: "wrap",
           justifyContent: "center",
           width: "100%",
-          maxWidth: 860,
+          maxWidth: 1060,
+          marginBottom: 36,
         }}
       >
-        {comparisons.map((item) => {
+        {approaches.map((item) => {
           const isHovered = hoveredId === item.id;
           return (
             <div
@@ -105,48 +134,57 @@ export const ProblemSection: FC = () => {
               onMouseEnter={() => setHoveredId(item.id)}
               onMouseLeave={() => setHoveredId(null)}
               style={{
-                flex: "1 1 380px",
+                flex: "1 1 310px",
+                maxWidth: 340,
                 borderRadius: "var(--radius-lg)",
-                padding: 30,
+                padding: 26,
                 transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
                 borderColor: isHovered
-                  ? `${item.color}`
+                  ? item.color
                   : "rgba(94,234,212,0.06)",
-                boxShadow: isHovered
-                  ? `0 0 60px ${item.color}12`
-                  : "none",
+                boxShadow: isHovered ? `0 0 50px ${item.color}10` : "none",
                 cursor: "default",
               }}
             >
-              <div style={{ fontSize: 36, marginBottom: 12 }}>
+              <div style={{ fontSize: 32, marginBottom: 10 }}>
                 {item.emoji}
               </div>
               <h3
                 className="mono"
                 style={{
                   color: item.color,
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: 600,
-                  marginBottom: 20,
+                  marginBottom: 6,
                   letterSpacing: "0.02em",
                 }}
               >
                 {item.title}
               </h3>
+              <div
+                style={{
+                  color: "var(--ink-muted)",
+                  fontSize: 11,
+                  marginBottom: 18,
+                  fontFamily: "var(--font-mono)",
+                }}
+              >
+                {item.who}
+              </div>
 
               {item.steps.map((step, i) => (
                 <div
                   key={i}
                   style={{
                     color: "var(--ink-secondary)",
-                    fontSize: 14,
-                    padding: "7px 0",
+                    fontSize: 13,
+                    padding: "5px 0",
                     borderBottom:
                       i < item.steps.length - 1
                         ? "1px solid rgba(255,255,255,0.03)"
                         : "none",
                     display: "flex",
-                    gap: 10,
+                    gap: 9,
                     alignItems: "flex-start",
                     lineHeight: 1.5,
                   }}
@@ -155,9 +193,9 @@ export const ProblemSection: FC = () => {
                     className="mono"
                     style={{
                       color: item.color,
-                      fontSize: 11,
+                      fontSize: 10,
                       opacity: 0.5,
-                      minWidth: 18,
+                      minWidth: 16,
                       marginTop: 2,
                     }}
                   >
@@ -167,37 +205,132 @@ export const ProblemSection: FC = () => {
                 </div>
               ))}
 
-              <div
-                style={{
-                  display: "flex",
-                  gap: 10,
-                  marginTop: 22,
-                  flexWrap: "wrap",
-                }}
-              >
-                {item.stats.map((s) => (
+              <div style={{ marginTop: 16 }}>
+                {item.pros.map((p, i) => (
                   <div
-                    key={s.label}
+                    key={i}
                     style={{
-                      background: "rgba(0,0,0,0.3)",
-                      borderRadius: "var(--radius-sm)",
-                      padding: "7px 14px",
                       fontSize: 12,
-                      fontFamily: "var(--font-mono)",
+                      color: "var(--accent-electric)",
+                      padding: "3px 0",
+                      display: "flex",
+                      gap: 6,
+                      lineHeight: 1.4,
                     }}
                   >
-                    <span style={{ color: "var(--ink-muted)" }}>
-                      {s.label}:{" "}
-                    </span>
-                    <span style={{ color: item.color, fontWeight: 600 }}>
-                      {s.value}
-                    </span>
+                    <span style={{ opacity: 0.6 }}>✓</span> {p}
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ marginTop: 8 }}>
+                {item.cons.map((c, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      fontSize: 12,
+                      color: "var(--accent-hot)",
+                      padding: "3px 0",
+                      display: "flex",
+                      gap: 6,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    <span style={{ opacity: 0.6 }}>✗</span> {c}
                   </div>
                 ))}
               </div>
             </div>
           );
         })}
+      </div>
+
+      {/* Bottom: the shared problem */}
+      <div
+        className="glass"
+        style={{
+          maxWidth: 740,
+          width: "100%",
+          borderRadius: "var(--radius-lg)",
+          padding: 28,
+          borderColor: "rgba(251,113,133,0.15)",
+          textAlign: "center",
+        }}
+      >
+        <div
+          className="mono"
+          style={{
+            color: "var(--accent-hot)",
+            fontSize: 13,
+            fontWeight: 600,
+            marginBottom: 14,
+            letterSpacing: "0.04em",
+          }}
+        >
+          ✗ El problema compartido
+        </div>
+        <p
+          style={{
+            color: "var(--ink-secondary)",
+            fontSize: 15,
+            lineHeight: 1.7,
+            maxWidth: 600,
+            margin: "0 auto",
+          }}
+        >
+          Da igual el enfoque: el agente siempre{" "}
+          <strong style={{ color: "var(--ink-primary)" }}>
+            adivina desde fuera
+          </strong>{" "}
+          qué puede hacer la web. Cada interacción requiere múltiples
+          round-trips. Si la estructura cambia, se rompe. Las tasas de éxito en
+          producción oscilan entre el{" "}
+          <span className="mono" style={{ color: "var(--accent-hot)" }}>
+            30%
+          </span>{" "}
+          y el{" "}
+          <span className="mono" style={{ color: "var(--accent-gold)" }}>
+            89%
+          </span>{" "}
+          según herramienta y tarea.
+        </p>
+        <div
+          style={{
+            marginTop: 20,
+            display: "flex",
+            gap: 14,
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {[
+            { label: "latencia/screenshot", value: "+0.8s", src: "Browser-Use benchmark" },
+            { label: "visión vs DOM coste", value: "10-20x", src: "AIMultiple" },
+            { label: "éxito producción", value: "30-89%", src: "Firecrawl survey" },
+          ].map((s) => (
+            <div
+              key={s.label}
+              style={{
+                background: "rgba(0,0,0,0.3)",
+                borderRadius: "var(--radius-sm)",
+                padding: "8px 16px",
+                fontSize: 12,
+                fontFamily: "var(--font-mono)",
+                textAlign: "left",
+              }}
+            >
+              <div style={{ color: "var(--ink-muted)", marginBottom: 2 }}>
+                {s.label}
+              </div>
+              <div style={{ color: "var(--accent-hot)", fontWeight: 600, fontSize: 16 }}>
+                {s.value}
+              </div>
+              <div style={{ color: "var(--ink-muted)", fontSize: 10, opacity: 0.6, marginTop: 2 }}>
+                {s.src}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </Slide>
   );
