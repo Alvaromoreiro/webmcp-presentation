@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+
+:root {
+  /* ─── Palette: Deep void + electric accents ─── */
+  --bg-void: #06060c;
+  --bg-surface: #0c0c16;
+  --bg-elevated: #12121f;
+  --bg-card: rgba(14, 14, 26, 0.75);
+
+  --ink-primary: #e8e6f0;
+  --ink-secondary: rgba(232, 230, 240, 0.55);
+  --ink-muted: rgba(232, 230, 240, 0.3);
+
+  --accent-electric: #5eead4;
+  --accent-hot: #fb7185;
+  --accent-signal: #a78bfa;
+  --accent-gold: #fbbf24;
+  --accent-sky: #38bdf8;
+
+  /* ─── Typography ─── */
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body: 'Outfit', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
+
+  /* ─── Spacing ─── */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --glow-electric: 0 0 40px rgba(94, 234, 212, 0.08);
+  --glow-hot: 0 0 40px rgba(251, 113, 133, 0.08);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--bg-void);
+  color: var(--ink-primary);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-void);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(94, 234, 212, 0.2);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(94, 234, 212, 0.4);
+}
+
+::selection {
+  background: rgba(94, 234, 212, 0.25);
+  color: var(--ink-primary);
+}
+
+/* ─── Animations ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(180px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(180px) rotate(-360deg); }
+}
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes scan-line {
+  0% { top: -2px; }
+  100% { top: 100%; }
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink-caret {
+  50% { border-color: transparent; }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ─── Utility ─── */
+.glass {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(94, 234, 212, 0.08);
+}
+
+.glass:hover {
+  border-color: rgba(94, 234, 212, 0.18);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.serif {
+  font-family: var(--font-display);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-electric), var(--accent-signal), var(--accent-hot));
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
